@@ -27,7 +27,7 @@ from torch._inductor.stream_constants import (
 from torch._inductor.stream_utils import get_stream_name
 from torch._inductor.test_case import TestCase as InductorTestCase
 from torch._inductor.utils import IndentedBuffer
-from torch.testing._internal.common_cuda import TEST_CUDA
+from torch.testing._internal.common_cuda import TEST_CUDA, skipIfNoTriton
 from torch.testing._internal.common_utils import instantiate_parametrized_tests
 
 
@@ -185,6 +185,7 @@ class TestStreamCodegen(InductorTestCase):
 
 
 @unittest.skipIf(not TEST_CUDA, "requires CUDA")
+@skipIfNoTriton
 class TestUserStreamCompile(InductorTestCase):
     """End-to-end tests for torch.compile with user stream contexts."""
 
@@ -1262,6 +1263,7 @@ with torch.cuda._DeviceGuard(0):
 
 
 @unittest.skipUnless(TEST_CUDA, "requires CUDA")
+@skipIfNoTriton
 class TestGenericStreamCompile(InductorTestCase):
     """Tests for torch.compile with device-agnostic torch.Stream API."""
 

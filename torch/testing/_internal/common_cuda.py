@@ -6,6 +6,7 @@ import functools
 import torch
 import torch.cuda
 from torch.testing._internal.common_utils import LazyVal, TEST_NUMBA, TEST_WITH_ROCM, TEST_CUDA, IS_WINDOWS, IS_MACOS
+from torch.utils._triton import has_triton
 import inspect
 import contextlib
 import os
@@ -436,6 +437,16 @@ def xfailIfSM120OrLater(func):
 
 def xfailIfDistributedNotSupported(func):
     return func if not (IS_MACOS or IS_JETSON) else unittest.expectedFailure(func)
+
+
+def xfailIfSM89OrLaterOnWindows(reason="Expected failure on Windows with CUDA SM >= 8.9"):
+    """Mark the test as expected failure when on Windows and CUDA SM >= 8.9."""
+    def decorator(test_fn):
+        return test_fn if not (IS_WINDOWS and SM89OrLater) else unittest.expectedFailure(test_fn)
+    return decorator
+
+
+skipIfNoTriton = unittest.skipIf(IS_WINDOWS and not has_triton(), "Triton not available on Windows")
 
 # When using nvcc from the CUDA toolkit its versuib must be at least the one from ptxas bundled with Triton
 TRITON_PTXAS_VERSION = (12, 8)
